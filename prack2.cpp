@@ -1,7 +1,10 @@
 #include <iostream>
 #include <cstring>
+#include <cmath>
 
 using namespace std;
+
+bool compareDoubles(double obj1, double obj2, double eps){return abs(obj1-obj2)<eps;}//eps - точность
 
 class MyArrayParent
 {
@@ -16,46 +19,54 @@ protected:
     // Увеличение вместимости массива на заранее определенную константу
     void incrCap(double exp=2.0) {
         capacity = (int)(capacity*exp);
-        double* p_newArr = new double[capacity];
-        for (int i = 0; i < count; i++)
-        {
-            p_newArr[i] = ptr[i];
-        }
+        if (new double[capacity] != NULL){
+            double* p_newArr = new double[capacity];
+            for (int i = 0; i < count; i++)
+            {
+                p_newArr[i] = ptr[i];
+            }
 
-        if (ptr)
-        {
-            delete[] ptr;
+            if (ptr)
+            {
+                delete[] ptr;
+            }
+            ptr = p_newArr;
         }
-        ptr = p_newArr;
     }
-
 public:
     //конструкторы и деструктор
     MyArrayParent(int Dimension = 100){
         cout << "\nMyArray constructor";
-        ptr = new double[Dimension];
-        capacity = Dimension;
-        count = 0;
+        if (new double[Dimension] != NULL){
+            ptr = new double[Dimension];
+            capacity = Dimension;
+            count = 0;
+        }
     }
     //конструктор принимает существующий массив
     MyArrayParent(double* arr, int Dimension){
         cout << "\nMyArray constructor";
         capacity = Dimension*2;
         count = Dimension;
-        ptr = new double[capacity];
-        for (int i=0;i<count;i++){
-            ptr[i]=arr[i];
+        if (new double[capacity] != NULL){
+            ptr = new double[capacity];
+            for (int i=0;i<count;i++){
+                ptr[i]=arr[i];
+            }
         }
         //заполнить массив ptr, заполнить поля
     }
     // Конструктор (копий) MyArrayParent
     MyArrayParent(const MyArrayParent& cop) {
         cout << "Copy constructor\n";
-        ptr = new double[cop.capacity];
-        count = cop.count;
-        capacity = cop.capacity;
-        for (int i = 0; i < count; i++) {
-            ptr[i] = cop.ptr[i];
+        if (new double[cop.capacity] != NULL){
+            ptr = new double[cop.capacity];
+            count = cop.count;
+            capacity = cop.capacity;
+
+            for (int i = 0; i < count; i++) {
+                ptr[i] = cop.ptr[i];
+            }
         }
     }
     //деструктор
@@ -90,8 +101,10 @@ public:
     }
     //удаление элемента с конца
     void RemoveLastValue(){
-        if (count >= 0)
+        if (count >= 0){
+            ptr[count] = NULL;
             count--;
+        }
         // else
         //     cout << "ERROR! Array is space!";
         //что делаем, если пуст?
@@ -100,25 +113,27 @@ public:
         return ptr[index];
         //перегрузка оператора []
     }
-    double* indexOf(double* abcd) {
-        string n;
-        int c = 0;
-        double* abcdres;
-        for (auto i : abcd) {
-            n = to_string(i);
-            if (int(n[0]-'0')+ int(n[1] - '0') == int(n[2] - '0') + int(n[3] - '0')) {
-                abcdres[c] = i;
-                c++
+    int indexOf(double elem, bool b_searchFromStart = true) {
+        if(b_searchFromStart){
+            for(int i = 0; i < count; i++){
+                if(compareDoubles(ptr[i],elem,(double)(0.00001))){return i;}
             }
         }
-        return abcdres;
+        else{
+            for(int i = count; i >= 0; i--){
+                if(compareDoubles(ptr[i],elem,(double)(0.00001))){return i;}
+            }
+        }
+        return -1;
     }
     MyArrayParent& operator=(const MyArrayParent& V){
         cout << "\noperator = ";
         if (capacity < V.capacity) {
             delete[] ptr;
-            ptr = new double[V.capacity];
-            capacity = V.capacity;
+            if (new double[V.capacity] != NULL){
+                ptr = new double[V.capacity];
+                capacity = V.capacity;
+            }
         }
         count = V.count;
         for (int i = 0; i < count; i++) {
@@ -127,10 +142,6 @@ public:
         return *this;
         //оператор =
         //arr1 = arr2 = arr3; где arr_i - объекты нашего класса
-}
-    MyArrayParent(const MyArrayParent& V){
-        cout << "\nCopy constructor";
-        //создание копии объекта - в основном, при возвращении результата из функции / передаче параметров в функцию
     }
     void print(){
         cout << "\nMyArr, size: " << count << ", values: {";
@@ -192,12 +203,35 @@ public:
         return res;
     }
     //Добавить функцию из 5 пункта 8 варианта
+    MyArrayChild func5(){
+        MyArrayChild res = MyArrayChild();
+        string n;
+        for (int i = 0; i < count - 1; i++){
+            n = to_string(ptr[i]);
+            if (int(n[0]-'0')+ int(n[1] - '0') == int(n[2] - '0') + int(n[3] - '0')){
+                res.push(ptr[i]);
+            }
+            return res;
+        }
+        // string n;
+        //     int c = 0;
+        //     double* abcdres;
+        //     for (int i = 0; i < (sizeof(abcd)/sizeof(abcd[0]));i++) {
+        //         n = to_string(abcd[i]);
+        //         if (int(n[0]-'0')+ int(n[1] - '0') == int(n[2] - '0') + int(n[3] - '0')) {
+        //             abcdres[c] = i;
+        //             c++;
+        //         }
+        //     }
+        //     return abcdres;
+    }
 };
     MyArrayChild operator+(double elem, MyArrayChild arr) {
         MyArrayChild res = MyArrayChild(arr);
         res.push(elem);
         return res;
     }
+
 class MySortedArray : public MyArrayChild 
 {
 protected:
