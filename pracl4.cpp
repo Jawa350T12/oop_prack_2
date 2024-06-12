@@ -13,36 +13,32 @@ public:
         len = strlen(ptr) + 1;
         capacity = 256;
         p = new char[capacity];
-        for(int i=0;i<len;i++){
-            p[i] = ptr[i];
+        if (p != NULL){
+            for(int i=0;i<len;i++){
+                p[i] = ptr[i];
+            }
+            p[len] = '\0';
         }
-        p[len] = '\0';
-    }
-    BaseString(char* ptr){
-        //cout<<"\nBase Constructor 1\n";
-        len = strlen(ptr) + 1;
-        capacity = 256;
-        p = new char[capacity];
-        for(int i=0;i<len;i++){
-            p[i] = ptr[i];
-        }
-        p[len] = '\0';
     }
     BaseString(int Capacity = 256){
         //cout<<"\nBase Constructor 0\n";
         capacity = Capacity;
         p = new char[capacity];
-        len = 0;
+        if (p != NULL){
+            len = 0;
+        }
     }
     BaseString(const BaseString& cbs){
         //cout<<"\nBase Copy Constructor\n";
         len = cbs.len;
         p = new char[cbs.capacity];
-        capacity = cbs.capacity;
-        for(int i=0;i<cbs.len - 1;i++){
-            p[i] = cbs.p[i];
+        if (p != NULL){
+            capacity = cbs.capacity;
+            for(int i=0;i<cbs.len - 1;i++){
+                p[i] = cbs.p[i];
+            }
+            p[len-1] = '\0';
         }
-        p[len-1] = '\0';
     }
     ~BaseString(){
         //cout<<"\nBase Destructor\n";
@@ -60,12 +56,14 @@ public:
         //cout<<"\nBase Operator = \n";
         len = s.Length();
         p = new char[s.capacity];
-        capacity = s.capacity;
-        for(int i=0;i<s.Length();i++){
-            p[i] = s[i];
+        if (p != NULL){
+            capacity = s.capacity;
+            for(int i=0;i<s.Length();i++){
+                p[i] = s[i];
+            }
+            //strcpy(p, s.get());
+            p[len-1] = '\0';
         }
-        //strcpy(p, s.get());
-        p[len-1] = '\0';
         return *this;
     }
     virtual void print(){
@@ -79,6 +77,7 @@ class ChaildString:public BaseString
 protected:
     char* p; int len; int capacity;
 public:
+    ChaildString() : BaseString(){}
     ChaildString(char* p) : BaseString(p){}
     ChaildString(int capacity) : BaseString(capacity){}
     ChaildString(const ChaildString& cbs) : BaseString(cbs){}
@@ -88,27 +87,29 @@ public:
         //cout<<"\nBase Operator = \n";
         len = s.Length();
         p = new char[s.capacity];
-        capacity = s.capacity;
-        for(int i=0;i<s.Length();i++){
-            p[i] = s[i];
+        if (p != NULL){
+            capacity = s.capacity;
+            for(int i=0;i<s.Length();i++){
+                p[i] = s[i];
+            }
+            //strcpy(p, s.get());
+            p[len-1] = '\0';
         }
-        //strcpy(p, s.get());
-        p[len-1] = '\0';
         return *this;
     }
 
-    ChaildString codsalat(){
-        ChaildString res;
-        if (res.p != NULL){
-            for (int i = 0; i < len; i++){
-                res[i] = char(int(p[i])+1);
+    void codsalat(){
+        ChaildString res(*this);
+        if (p != NULL){
+            for (int i = 0; i < res.Length(); i++){
+                res.p[i] = char(int(p[i])+1);
+                //cout << char(int(p[i])+1) << ' ';
             }
         }
-        
         //p[len]='\0';
-        res.print();
+        //res.print();
         //*this = reskon;
-        return res;
+        p = res.p;
     }
     //char* decodsalat(){}
 };
