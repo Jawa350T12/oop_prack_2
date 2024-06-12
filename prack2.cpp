@@ -17,29 +17,30 @@ protected:
     double* ptr;
 
     // Увеличение вместимости массива на заранее определенную константу
-    void incrCap(double exp=2.0) {
-        capacity = (int)(capacity*exp);
-        if (new double[capacity] != NULL){
+    void incrCap(double exp) {
+        if (ptr != NULL){
+            capacity = (int)(capacity*exp);
             double* p_newArr = new double[capacity];
-            for (int i = 0; i < count; i++)
-            {
-                p_newArr[i] = ptr[i];
-            }
+            if(p_newArr!=NULL){
+                for (int i = 0; i < count; i++){
+                    p_newArr[i] = ptr[i];
+                }
 
-            if (ptr)
-            {
-                delete[] ptr;
+                if (ptr){
+                    delete[] ptr;
+                }
+                ptr = p_newArr;
             }
-            ptr = p_newArr;
+        }else{
+            ptr = new double[capacity];
         }
     }
 public:
     //конструкторы и деструктор
-    MyArrayParent(int Dimension = 100){
+    MyArrayParent(capacity = 100){
         cout << "\nMyArray constructor";
-        if (new double[Dimension] != NULL){
-            ptr = new double[Dimension];
-            capacity = Dimension;
+        ptr = new double[capacity];
+        if (ptr != NULL){
             count = 0;
         }
     }
@@ -48,8 +49,8 @@ public:
         cout << "\nMyArray constructor";
         capacity = Dimension*2;
         count = Dimension;
-        if (new double[capacity] != NULL){
-            ptr = new double[capacity];
+        ptr = new double[capacity];
+        if (ptr != NULL){
             for (int i=0;i<count;i++){
                 ptr[i]=arr[i];
             }
@@ -59,8 +60,8 @@ public:
     // Конструктор (копий) MyArrayParent
     MyArrayParent(const MyArrayParent& cop) {
         cout << "Copy constructor\n";
-        if (new double[cop.capacity] != NULL){
-            ptr = new double[cop.capacity];
+        ptr = new double[cop.capacity];
+        if (ptr != NULL){
             count = cop.count;
             capacity = cop.capacity;
 
@@ -130,8 +131,8 @@ public:
         cout << "\noperator = ";
         if (capacity < V.capacity) {
             delete[] ptr;
-            if (new double[V.capacity] != NULL){
-                ptr = new double[V.capacity];
+            ptr = new double[V.capacity];
+            if (ptr != NULL){
                 capacity = V.capacity;
             }
         }
@@ -181,7 +182,7 @@ public:
         if (index < 0 || index > count) {
             throw out_of_range("invalid index");
         }
-        if (count >= capacity) {incrCap();}
+        if (count >= capacity) {incrCap(2.0);}
         for (int i = count; i > index; i--) {ptr[i] = ptr[i - 1];}
         count++;
         ptr[index] = value;
